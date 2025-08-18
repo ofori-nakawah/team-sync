@@ -3,6 +3,9 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import session from "cookie-session";
 import { config } from "./config/app.config";
+import connectDatabase from "./config/database.config";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { HTTP_STATUS } from "./config/http.config";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -20,13 +23,15 @@ app.use(
   })
 );
 app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
+app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({
+  res.status(HTTP_STATUS.OK).json({
     message: "Loading team sync api...",
   });
 });
 
 app.listen(config.PORT, async () => {
   console.log(`Server listening on prot ${config.PORT} in ${config.NODE_ENV}`);
+  await connectDatabase();
 });

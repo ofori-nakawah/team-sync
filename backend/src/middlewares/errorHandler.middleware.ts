@@ -1,5 +1,6 @@
 import { ErrorRequestHandler } from "express";
 import { HTTP_STATUS } from "../config/http.config";
+import { AppError } from "../utils/appError";
 
 export const errorHandler: ErrorRequestHandler = (
   error,
@@ -13,6 +14,13 @@ export const errorHandler: ErrorRequestHandler = (
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       message:
         "Invalid JSON format. Please check your request body and try again.",
+    });
+  }
+
+  if (error instanceof AppError) {
+    return res.status(error.statusCode).json({
+      message: error.message,
+      errorCode: error.errorCode,
     });
   }
 
